@@ -12,6 +12,7 @@ const WatchPage = () => {
     const dispatch = useDispatch();
     useEffect(()=>{
         dispatch(closeSideBar());
+        window.scrollTo(0,0) // scrolls the page at very top
     },[])
   return (
     <div className='w-full'>

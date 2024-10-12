@@ -1,44 +1,16 @@
-import React, { useEffect, useState } from 'react'
-import {useDispatch,useSelector} from 'react-redux'
+import React,{useState} from 'react'
+import {useDispatch} from 'react-redux'
 import { toggleSideBar } from '../utils/appSlice';
-import { YOUTUBE_SEARCH_API,ham_img, USER_IMG, Bell_icon, youtube_logo } from '../utils/constants';
-import { cacheResults } from '../utils/searchSlice';
+import {ham_img, USER_IMG, Bell_icon, youtube_logo } from '../utils/constants';
+import useSuggestionBox from '../utils/useSuggestionBox';
+
 
 const Header = () => {
-    const [searchQuery,setSearchQuery] = useState();
-    const [suggestion,setSuggestion] = useState([]);
-    const [suggestionBox,setSuggestionBox] = useState(false);
-    const dispatch = useDispatch();
-    const handleHamClick = ()=>{
-        dispatch(toggleSideBar())
-    }
-    const searchCache = useSelector(store => store.search)
-    // console.log(searchCache[searchQuery])
-    useEffect(()=>{
-      // console.log(searchQuery) 
-      if(!searchQuery) return;    // it'll not show undefined(early returning)
-      const timer = setTimeout(()=>{
-        if(searchCache[searchQuery]){
-          setSuggestion(searchCache[searchQuery])
-        }else{
-           getSearchSuggestion();
-        }
-      },200);
-      return ()=>{
-        clearTimeout(timer);
-      }
-    },[searchQuery])
-    const getSearchSuggestion = async()=>{
-      console.log("API CALL"+ searchQuery)
-      const data = await fetch(YOUTUBE_SEARCH_API+searchQuery);
-      const json =await data.json();
-      // console.log(json[1])
-      setSuggestion(json[1]);
-      dispatch(cacheResults({
-        [searchQuery]:json[1]
-      }))
-
-    }
+  const [searchQuery,suggestion,suggestionBox,setSearchQuery,setSuggestion,setSuggestionBox] = useSuggestionBox();
+  const dispatch = useDispatch();
+  const handleHamClick = ()=>{
+       dispatch(toggleSideBar())
+  }
   return (
     <div className='grid grid-flow-col p-3 m-2 shadow-lg'>
       <div className='flex col-span-1  items-center gap-4 '>
@@ -48,13 +20,16 @@ const Header = () => {
       </div>
       <div className=' col-span-10 place-content-center'>
         <div>
-        <input className='border border-black p-2  w-1/2 rounded-l-full' placeholder='Search' type="text" value={searchQuery} onChange={(e)=>setSearchQuery(e.target.value)} onFocus={()=>setSuggestionBox(true)} onMouseEnter={()=>setSuggestionBox(true)}   />
+        <input className='border border-black p-2  w-1/2 rounded-l-full' placeholder='Search' type="text" value={searchQuery} onChange={(e)=>setSearchQuery(e.target.value)} onClick={()=>setSuggestionBox(true)}    />
         <button className='text-center border border-black  rounded-r-full bg-gray-400  p-2 '>Search</button>
       </div>
-      {suggestionBox&&(<div className='fixed mx-1 bg-gray-50 w-[27.5rem] rounded-lg' onMouseLeave={()=>setSuggestionBox(false)}>
+      {suggestionBox&&(<div className='fixed mx-1 bg-gray-50 w-[27.5rem] rounded-lg' >
         <ul className='mx-2 '>
           
-          {suggestion.map((query,index) => <li key={index} onClick={()=>{setSearchQuery(query)}} className='py-2 shadow-sm hover:bg-gray-300 rounded-md'>{query}</li>)}
+          {suggestion.map((query,index) => <li key={index} onClick={()=>{
+            setSearchQuery(query)
+            setSuggestionBox(false)
+            }} className='py-2 shadow-sm hover:bg-gray-300 rounded-md'>{query}</li>)}
         </ul>
       </div>)}
       </div>

@@ -1,9 +1,12 @@
-import React from 'react'
-import {useSelector} from 'react-redux';
+import React,{useEffect} from 'react'
+import {useDispatch, useSelector} from 'react-redux';
 import {Link} from 'react-router-dom'
+
+
 const Sidebar = () => {
     const isSideBar = useSelector(store=> store.app.isSideBarOpen);
     // or else we can do early return {if(!isSideBar) return null}
+    
     return isSideBar && (
     <div className='p-5 m-2 border shadow-lg w-64'>
         <p className='text-xl font-bold'><Link to='/'>Home</Link> </p>
